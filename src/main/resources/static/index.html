@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spotahome test</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<main>
+    <section>
+        <header>Homes table</header>
+        <div id="loading_message"><p>Table loading</p></div>
+        <article>
+            <button type="button" id="download_button">Click me to get the data as JSON</button>
+            <table id="homes_table" class="table" data-last-query="">
+                <thead>
+                <tr>
+                    <th data-sort-order="+">id</th>
+                    <th data-sort-order="+">city</th>
+                    <th data-sort-order="+">link</th>
+                    <th data-sort-order="+">title</th>
+                    <th data-sort-order="+">main_img_link</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </article>
+    </section>
+</main>
+<footer>
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous">
+    </script>
+    <script type="application/javascript">
+        $(document).ready(function(){
+            function init() {
+                $("#homes_table").hide();
+                $("#download_button").hide();
+
+                const queryProperties = "?page=1&page_size=50";
+
+                $.ajax({
+                    url: `/api/homes`,
+                    success: function(result) {
+                        buildTable(result);
+                        $("#loading_message").hide();
+                        $("#homes_table").data("last-query", queryProperties);
+                        $("#homes_table").show();
+                        $("#download_button").show();
+                    }
+                });
+
+                $("#homes_table > thead").click(function(element) {
+                    const field = $(element.target).text();
+                    const sign = toggleSortOrder($(element.target).data("sort-order"));
+                    const queryProperties = `?sortedBy=${encodeURIComponent(sign)}${field}`;
+
+                    $.ajax({
+                        url: `/api/homes${queryProperties}`,
+                        success: function(result) {
+                            buildTable(result);
+                            $("#homes_table").data("last-query", queryProperties);
+                            $(element.target).data("sort-order", sign);
+                        }
+                    });
+                });
+
+                $("#download_button").click(function () {
+                    console.log($("#homes_table").data("last-query"));
+                    const lastQuery = $("#homes_table").data("last-query");
+
+                    $.ajax({
+                        url: `/api/download${lastQuery}`,
+                        success: function() {
+                            window.location.href = 'homes.json';
+                        }
+                    });
+                })
+            }
+
+            function buildTable(result) {
+                const tableRows = result.map( home => {
+                    return `<tr>
+                        <td>${home.id}</td>
+                        <td>${home.city}</td>
+                        <td><a href="${home.url}">${home.url}</a></td>
+                        <td>${home.title}</td>
+                        <td><a href="${home.picture}">${home.picture}</a></td>
+                    `
+                }).join('</tr>');
+
+                $("#homes_table").find("tbody").html(tableRows);
+            }
+
+            function toggleSortOrder(order) {
+                if (order === "+") {
+                    return "-";
+                }
+
+                return "+";
+            }
+
+            init();
+        })
+    </script>
+</footer>
+
+</body>
+
+</html>
