@@ -6,4 +6,5 @@ public interface HomeRepository {
 
     List<Home> findAllSortedBy(SortingCriteria criteria);
 
+    void save(Home home);
 }

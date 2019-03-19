@@ -28,4 +28,10 @@ public class HomeJpaRepository implements HomeRepository {
         return homes.stream().map(homeJpaEntity -> homeJpaEntity.toDomain())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void save(Home home) {
+        HomeJpaEntity homeJpaEntity = HomeJpaEntity.fromDomain(home);
+        entityManager.persist(homeJpaEntity);
+    }
 }

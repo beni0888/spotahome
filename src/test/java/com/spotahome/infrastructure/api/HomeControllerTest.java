@@ -85,6 +85,6 @@ public class HomeControllerTest {
     }
 
     private Home aHome(Long id, String title, String city, String url, String picture) {
-        return Home.create(id, title, city, URI.create(url), URI.create(picture));
+        return Home.create(id, title, city, url, picture);
     }
 }

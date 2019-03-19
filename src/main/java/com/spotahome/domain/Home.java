@@ -18,8 +18,16 @@ public class Home {
         this.picture = picture;
     }
 
-    public static Home create(Long id, String title, String city, URI url, URI picture) {
-        return new Home(id, title, city, url, picture);
+    public static Home create(Long id, String title, String city, String url, String picture) {
+        return new Home(id, title, city, parseUrl(url), parseUrl(picture));
+    }
+
+    private static URI parseUrl(String url) {
+        try {
+            return URI.create(url);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Long getId() {

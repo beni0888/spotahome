@@ -31,8 +31,8 @@ public class HomeJpaRepositoryTest {
 
     @Test
     public void givenFindAllSortedBy_whenItIsCalledPassingId_thenItWorks() {
-        HomeJpaEntity home1 = aHomeEntity("Home 1", "Madrid", "http://foo.com/home-1", "http://foo.com/picture-1.jpg");
-        HomeJpaEntity home2 = aHomeEntity("Home 2", "Barcelona", "http://foo.com/home-2", "http://foo.com/picture-2.jpg");
+        HomeJpaEntity home1 = aHomeEntity(1L, "Home 1", "Madrid", "http://foo.com/home-1", "http://foo.com/picture-1.jpg");
+        HomeJpaEntity home2 = aHomeEntity(2L, "Home 2", "Barcelona", "http://foo.com/home-2", "http://foo.com/picture-2.jpg");
 
         home1 = entityManager.persist(home1);
         home2 = entityManager.persistAndFlush(home2);
@@ -46,8 +46,8 @@ public class HomeJpaRepositoryTest {
 
     @Test
     public void givenFindAllSortedBy_whenItIsCalledPassingTitle_thenItWorks() {
-        HomeJpaEntity home1 = aHomeEntity("B Home 1", "Madrid", "http://foo.com/home-1", "http://foo.com/picture-1.jpg");
-        HomeJpaEntity home2 = aHomeEntity("A Home 2", "Barcelona", "http://foo.com/home-2", "http://foo.com/picture-2.jpg");
+        HomeJpaEntity home1 = aHomeEntity(1L, "B Home 1", "Madrid", "http://foo.com/home-1", "http://foo.com/picture-1.jpg");
+        HomeJpaEntity home2 = aHomeEntity(2L, "A Home 2", "Barcelona", "http://foo.com/home-2", "http://foo.com/picture-2.jpg");
 
         home1 = entityManager.persist(home1);
         home2 = entityManager.persistAndFlush(home2);
@@ -59,9 +59,21 @@ public class HomeJpaRepositoryTest {
         assertThat(homes.get(1).getId()).isEqualTo(home1.getId());
     }
 
-    private HomeJpaEntity aHomeEntity(String title, String city, String url, String picture) {
+    @Test
+    public void givenHome_whenSaveIsCalled_thenItIsPersisted() {
+        Home home = aHomeEntity(1L, "B Home 1", "Madrid", "http://foo.com/home-1", "http://foo.com/picture-1.jpg")
+                .toDomain();
+
+        repository.save(home);
+        entityManager.flush();
+
+        HomeJpaEntity fetchedHome = entityManager.find(HomeJpaEntity.class, home.getId());
+        assertThat(fetchedHome).isNotNull();
+    }
+
+    private HomeJpaEntity aHomeEntity(Long id, String title, String city, String url, String picture) {
         HomeJpaEntity homeJpaEntity = new HomeJpaEntity();
-        homeJpaEntity.setTitle(title).setCity(city).setUrl(url).setPicture(picture);
+        homeJpaEntity.setId(id).setTitle(title).setCity(city).setUrl(url).setPicture(picture);
         return homeJpaEntity;
     }
 }
